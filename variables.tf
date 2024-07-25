@@ -1,27 +1,4 @@
-variable "bucket_names" {
-  description = "List of S3 bucket names to create."
-  type        = list(string)
-  default     = ["bucket1", "bucket2"]
-}
-
-variable "secondary_machine_pool_name" {
-  description = "Name of the secondary machine pool."
-  type        = string
-  default     = "secondary-pool"
-}
-
-variable "secondary_machine_pool_instance_type" {
-  description = "Instance type for the secondary machine pool."
-  type        = string
-  default     = "m5.large"
-}
-
-variable "secondary_machine_pool_replicas" {
-  description = "Number of replicas for the secondary machine pool."
-  type        = number
-  default     = 2
-}
-
+#Cluster Vars
 variable "token" {
     type      = string
     sensitive = true
@@ -71,3 +48,30 @@ variable "autoscaling" {
   nullable    = true
   default     = null
 }
+
+# S3 vars
+variable "bucket_names" {
+  description = "List of S3 bucket names to create."
+  type        = list(string)
+  default     = ["bucket1", "bucket2"]
+}
+
+# Secondary Machine Pool vars
+variable "secondary_machine_pool_name" {
+  description = "Name of the secondary machine pool."
+  type        = string
+  default     = "secondary-pool"
+}
+
+variable "secondary_machine_pool_instance_type" {
+  description = "Instance type for the secondary machine pool."
+  type        = string
+  default     = "m5.large"
+}
+
+variable "secondary_machine_pool_replicas" {
+  description = "Number of replicas for the secondary machine pool."
+  type        = number
+  default     = 2
+}
+
