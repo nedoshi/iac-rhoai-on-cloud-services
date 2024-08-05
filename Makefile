@@ -19,29 +19,32 @@ venv:
 	$(VIRTUALENV)/bin/ansible-galaxy collection install -r requirements.yml $(IGNORE_CERTS_OPTION)
 
 init:
-	@terraform init
+	@ cd ./tf-rosa-hcp && terraform init
 
 plan:
-	@export TF_VAR_token="$$(bw get password ocm-api)" && \
+	@ cd ./tf-rosa-hcp && export TF_VAR_token="$$(bw get password ocm-api)" && \
 	export TF_VAR_admin_password="$$(bw get password admin)" && \
 	export TF_VAR_hosted_control_plane=true && \
-	terraform plan -out main.plan -var-file=terraform.tfvars
+	terraform plan -out main.plan -var-file=main.tfvars
 
 # cluster-private:
 # 	@export TF_VAR_private=true && terraform apply main.plan
 
 cluster-public:
-	@export TF_VAR_private=false && terraform apply main.plan
+	@cd ./tf-rosa/hcp export TF_VAR_private=false && terraform apply main.plan
 
 destroy:
-	@export TF_VAR_token="$$(bw get password ocm-api)" && \
+	@cd ./tf-rosa-hcp export TF_VAR_token="$$(bw get password ocm-api)" && \
 	export TF_VAR_admin_password="$$(bw get password cluster-admin)" && \
 	terraform destroy -var-file=main.tfvars
 
 ansible-rhoai:
-	@. $(BITWARDEN_APIKEY_FILE); \
-	bw login --apikey; \
-	source $(VIRTUALENV)/bin/activate && \
-	export BW_PASSWORD=$$(bw unlock --passwordenv BW_PASSWORD --raw); \
-	cd ansible && \
-	$(VIRTUALENV)/bin/ansible-playbook install-operators.yaml -i localhost --extra-vars "cluster_name=$(CLUSTER_NAME)"
+	@cd ./ansible && ansible-playbook --ask-vault-pass build_hcp_cluster.yaml
+
+
+	# @. $(BITWARDEN_APIKEY_FILE); \
+	# bw login --apikey; \
+	# source $(VIRTUALENV)/bin/activate && \
+	# export BW_PASSWORD=$$(bw unlock --passwordenv BW_PASSWORD --raw); \
+	# cd ansible && \
+	# $(VIRTUALENV)/bin/ansible-playbook install-operators.yaml -i localhost --extra-vars "cluster_name=$(CLUSTER_NAME)"

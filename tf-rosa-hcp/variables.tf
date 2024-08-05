@@ -1,4 +1,11 @@
 #Cluster Vars
+
+variable "cluster_name" {
+  description = "The name of the cluster.  This is also used as a prefix to name related components."
+  type        = string
+  default     = "cwooley-test"
+}
+
 variable "token" {
     type      = string
     sensitive = true
@@ -11,13 +18,24 @@ variable "admin_password" {
 variable "tags" {
   description = "Tags applied to all objects."
   type        = map(string)
-  default     = {}
+  default     = {
+    "cost-center"   = "CC468"
+    "service-phase" = "lab"
+    "app-code"      = "MOBB-001"
+    "owner"         = "cwooley_redhat.com"
+    "provisioner"   = "Terraform"
+  }
 }
 
 variable "region" {
   description = "The AWS region to provision a ROSA cluster and required components into."
   type        = string
   default     = "us-east-1"
+}
+
+variable "private" {
+  type = bool
+  default = false
 }
 
 variable "multi_az" {
@@ -30,6 +48,22 @@ variable "multi_az" {
   default     = false
 }
 
+variable "vpc_cidr" {
+  type = string 
+  default = "10.10.0.0/16"
+}
+
+variable "pod_cidr" {
+  type = string 
+  default = "10.128.0.0/14"
+  
+}
+
+variable "service_cidr" {
+  type = string
+  default = "172.30.0.0/16"
+  
+}
 variable "hosted_control_plane" {
   description = "Provision a ROSA cluster using a Hosted Control Plane."
   type        = bool
@@ -49,6 +83,24 @@ variable "autoscaling" {
   default     = null
 }
 
+variable "ocp_version"{
+  type = string
+}
+
+variable "compute_machine_type" {
+  type = string 
+  default = "p3.2xlarge"
+}
+
+variable "developer_password" {
+  description = <<EOF
+  Password for the 'developer' user. IDP is not created if unspecified.  Password must be 14 characters or more, contain
+  one uppercase letter and a symbol or number.
+  EOF
+  type        = string
+  sensitive   = true
+}
+
 # S3 vars
 variable "bucket_names" {
   description = "List of S3 bucket names to create."
@@ -57,16 +109,14 @@ variable "bucket_names" {
 }
 
 # Secondary Machine Pool vars
-variable "secondary_machine_pool_name" {
-  description = "Name of the secondary machine pool."
-  type        = string
-  default     = "secondary-pool"
+variable "secondary_machine_pool_instance_type" {
+  type = string 
+  default = "m5.xlarge"
 }
 
-variable "secondary_machine_pool_instance_type" {
-  description = "Instance type for the secondary machine pool."
-  type        = string
-  default     = "m5.large"
+variable "secondary_machine_pool_name" {
+  type = string 
+  default = "workbench-mp"
 }
 
 variable "secondary_machine_pool_replicas" {
