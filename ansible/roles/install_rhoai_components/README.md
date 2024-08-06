@@ -12,4 +12,3 @@
     - To discover and utilize hardware features available on cluster nodes
   - Nvidia GPU Graphics Driver
     - to enable GPU acceleration for AI/ML workloads on NVIDIA GPUs
-  - 

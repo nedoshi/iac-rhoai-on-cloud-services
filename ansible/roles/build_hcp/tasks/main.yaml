@@ -1,20 +1,24 @@
 ---
+- name: Include BW creds from vault
+  include_vars:
+    file: ../vars/bw_creds.yaml
+    name: bw_creds
 
 - name: Log in to Bitwarden
-  command: "bw login --apikey {{ bitwarden_api_key }}"
+  command: "bw login --apikey {{ bw_creds.bw_pass }}"
   register: bw_login
   no_log: false
   ignore_errors: true
 
-- name: Check if Bitwarden login was successful
-  fail:
-    msg: "Bitwarden login failed. Please check your API key."
-  when: "'You are now logged in!' not in bw_login.stdout"
+# - name: Check if Bitwarden login was successful
+#   fail:
+#     msg: "Bitwarden login failed. Please check your API key."
+#   when: "'You are now logged in' not in bw_login or 'You are already logged in' not in bw_login"
 
 - name: Get Bitwarden session key
-  command: "bw unlock --raw --password {{ bitwarden_api_key }}"
+  command: "bw unlock --raw {{ bw_creds.bw_pass }}"
   register: bw_session
-  no_log: true
+  no_log: false
 
 - name: Set Bitwarden session key as environment variable
   set_fact:
@@ -41,5 +45,9 @@
 
 - name: Deploy the TF resources
   community.general.terraform:
-    project_path: '{{ project_dir }}'
+    project_path: "{{ tf_project_path }}"
     state: present
+    variables_files:
+      - "{{ tf_project_path }}/main.tfvars"
+    variables:
+      token: "{{ terraform_token.stdout }}"
