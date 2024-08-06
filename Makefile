@@ -31,7 +31,7 @@ plan:
 # 	@export TF_VAR_private=true && terraform apply main.plan
 
 cluster-public:
-	@cd ./tf-rosa/hcp export TF_VAR_private=false && terraform apply main.plan
+	@cd ./tf-rosa-hcp export TF_VAR_private=false && terraform apply main.plan
 
 destroy:
 	@cd ./tf-rosa-hcp export TF_VAR_token="$$(bw get password ocm-api)" && \

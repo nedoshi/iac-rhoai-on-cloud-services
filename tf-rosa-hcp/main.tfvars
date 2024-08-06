@@ -16,3 +16,4 @@ secondary_machine_pool_instance_type = "m5.xlarge"
 secondary_machine_pool_replicas = 2
 vpc_cidr  = "10.10.0.0/16"
 developer_password = ""
+admin_password = "MyPassword123."
