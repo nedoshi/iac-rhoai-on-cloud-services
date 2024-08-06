@@ -27,14 +27,3 @@
         installPlanApproval: Automatic
         source: redhat-operators
         sourceNamespace: openshift-marketplace
-
-# - name: Wait for NFD Operator to be installed
-#   community.kubernetes.k8s_info:
-#     api_version: operators.coreos.com/v1alpha1
-#     kind: ClusterServiceVersion
-#     namespace: openshift-nfd
-#   register: csv_facts
-#   until: >
-#     csv_facts.resources | selectattr('status.phase', 'equalto', 'Succeeded') | list | length > 0
-#   retries: 10
-#   delay: 30

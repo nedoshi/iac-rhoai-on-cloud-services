@@ -42,13 +42,3 @@
         name: gpu-operator-certified
         source: certified-operators
         sourceNamespace: openshift-marketplace
-
-# - name: Verify NVIDIA GPU Operator pods
-#   community.okd.k8s_info:
-#     kind: Pod
-#     namespace: gpu-operator
-#   register: gpu_operator_pods
-
-# - name: Print GPU Operator pods
-#   debug:
-#     var: gpu_operator_pods.resources

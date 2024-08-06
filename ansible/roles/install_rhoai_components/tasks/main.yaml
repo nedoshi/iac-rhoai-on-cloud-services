@@ -1,20 +1,6 @@
 ---
 
-# - name: Install RHOAI Pre Req Operators as well as RHOAI
-#   include_tasks: "{{ item }}"
-#   with_items: 
-#     - cluster-login
-#     - install-other-operators
-#     - nvidia-gpu-operator
-#     - nfd-operator
-#     - install-rhoai
-# - name: Load Terraform Outputs
-#   include_vars:
-#     file: terraform_output.json
-#     name: tf_outputs
-
 - name: Get ROSA cluster api url from terraform outputs
-  # command: "pwd"
   command: "terraform output -json"
   args:
     chdir: "{{ terraform_dir }}"
@@ -39,35 +25,15 @@
   debug:
     msg: "Cluster API URL: {{ cluster_api_url }}"
 
-# - debug:
-#     msg: "{{ api_url.stdout }}"
-
 - name: login to ROSA cluster
   community.okd.openshift_auth:
     host: "{{ cluster_api_url }}"
     username: "{{ cluster_admin }}"
-    # need to configure this to pull from vault
+    # need to configure this to pull from vault if no vault, make sure the pw is set the same as 
+    # admin_p var in tfvars file
     password: "{{ admin_pw }}"  
     verify_ssl: false
   register: login
-
-- debug:
-    msg: "{{ login }}"
-
-# - name: Ensure helm is installed
-#   community.kubernetes.helm:
-#     name: helm
-#     state: present 
-
-# - name: Add MOBB helm repo
-#   community.kubernetes.helm_repository:
-#     name: mobb
-#     repo_url: https://rh-mobb.github.io/helm-charts/
-
-# - name: update Helm charts
-#   community.kubernetes.helm_repository:
-#     name: mobb
-#     state: update
 
 - include_tasks: "{{ item }}"
   with_items:
