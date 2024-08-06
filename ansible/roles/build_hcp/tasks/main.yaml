@@ -51,3 +51,4 @@
       - "{{ tf_project_path }}/main.tfvars"
     variables:
       token: "{{ terraform_token.stdout }}"
+      admin_password: "{{ admin_password.stdout }}"
