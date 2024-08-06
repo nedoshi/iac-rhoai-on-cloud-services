@@ -16,7 +16,7 @@ BITWARDEN_APIKEY_FILE ?= .apikey.mk
 venv: 
 	LC_ALL=en_US.UTF-8 python3 -m venv $(VIRTUALENV)
 	. $(VIRTUALENV)/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
-	$(VIRTUALENV)/bin/ansible-galaxy collection install -r requirements.yml $(IGNORE_CERTS_OPTION)
+	$(VIRTUALENV)/bin/ansible-galaxy collection install -r requirements.yaml $(IGNORE_CERTS_OPTION)
 
 init:
 	@ cd ./tf-rosa-hcp && terraform init

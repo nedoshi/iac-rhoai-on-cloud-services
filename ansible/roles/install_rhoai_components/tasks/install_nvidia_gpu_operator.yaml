@@ -1,5 +1,9 @@
+---
+
 - name: Ensure the gpu-operator namespace exists
-  kubernetes.core.k8s:
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
     state: present
     definition:
       apiVersion: v1
@@ -8,7 +12,9 @@
         name: gpu-operator
 
 - name: Create OperatorGroup for GPU Operator
-  kubernetes.core.k8s:
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
     state: present
     definition:
       apiVersion: operators.coreos.com/v1
@@ -21,7 +27,9 @@
           - gpu-operator
 
 - name: Create Subscription for GPU Operator
-  kubernetes.core.k8s:
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
     state: present
     definition:
       apiVersion: operators.coreos.com/v1alpha1
@@ -35,12 +43,12 @@
         source: certified-operators
         sourceNamespace: openshift-marketplace
 
-- name: Verify NVIDIA GPU Operator pods
-  kubernetes.core.k8s_info:
-    kind: Pod
-    namespace: gpu-operator
-  register: gpu_operator_pods
+# - name: Verify NVIDIA GPU Operator pods
+#   community.okd.k8s_info:
+#     kind: Pod
+#     namespace: gpu-operator
+#   register: gpu_operator_pods
 
-- name: Print GPU Operator pods
-  debug:
-    var: gpu_operator_pods.resources
+# - name: Print GPU Operator pods
+#   debug:
+#     var: gpu_operator_pods.resources

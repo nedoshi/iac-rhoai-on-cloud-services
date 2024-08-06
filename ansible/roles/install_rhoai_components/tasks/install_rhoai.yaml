@@ -1,8 +1,21 @@
 ---
 
+- name: Ensure the redhat-ods-operator namespace exists
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: redhat-ods-operator
 
 - name: Create Subscription for OpenShift AI Operator
-  k8s:
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: Subscription
@@ -10,25 +23,28 @@
         name: rhods-operator
         namespace: redhat-ods-operator
       spec:
-        channel: stable-2.10
+        channel: fast
         installPlanApproval: Automatic
         name: rhods-operator
         source: redhat-operators
         sourceNamespace: openshift-marketplace
 
 - name: Create Data Science Cluster
-  k8s:
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
     definition:
       apiVersion: datasciencecluster.opendatahub.io/v1
       kind: DataScienceCluster
       metadata:
-        name: default-data-science-cluster
+        name: default-dsc
         labels:
-          app.kubernetes.io/created-by: openshift-ai
-          app.kubernetes.io/instance: default-data-science-cluster
+          app.kubernetes.io/created-by: rhods-operator
+          app.kubernetes.io/instance: default-dsc
           app.kubernetes.io/managed-by: kustomize
-          app.kubernetes.io/name: datascience-cluster
-          app.kubernetes.io/part-of: openshift-ai
+          app.kubernetes.io/name: datasciencecluster
+          app.kubernetes.io/part-of: rhods-operator
       spec:
         components:
           codeflare:
@@ -38,10 +54,16 @@
           datasciencepipelines:
             managementState: Managed
           kserve:
+            serving:
+              ingressGateway:
+                certificate:
+                  type: OpenshiftDefaultIngress
+              managementState: Managed
+          kueue:
             managementState: Managed
-          modelmesh:
+          modelmeshserving:
             managementState: Managed
           ray:
             managementState: Managed
           workbenches:
-            managementState: Managed  
+            managementState: Managed

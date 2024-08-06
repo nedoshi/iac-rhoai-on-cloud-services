@@ -51,6 +51,9 @@
     verify_ssl: false
   register: login
 
+- debug:
+    msg: "{{ login }}"
+
 # - name: Ensure helm is installed
 #   community.kubernetes.helm:
 #     name: helm
@@ -70,7 +73,9 @@
   with_items:
     - install_other_operators.yaml
     - install_nfd.yaml
-    - install_nvidia_gpu_operators.yaml
+    - install_nvidia_gpu_operator.yaml
     - install_rhoai.yaml
   vars: 
-    kubeconfig: "{{ login.kubeconfig }}"
+    kubeconfig: "{{ login.openshift_auth }}"
+    api_key: "{{ login.openshift_auth.api_key }}"
+    host: "{{ login.openshift_auth.host }}"

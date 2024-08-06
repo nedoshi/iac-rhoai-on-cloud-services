@@ -1,7 +1,20 @@
 ---
 
+- name: Ensure the openshift-nfd namespace exists
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: openshift-nfd
+
 - name: Create Subscription
   community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: Subscription
@@ -11,16 +24,17 @@
       spec:
         channel: stable
         name: nfd
+        installPlanApproval: Automatic
         source: redhat-operators
         sourceNamespace: openshift-marketplace
 
-- name: Wait for NFD Operator to be installed
-  community.kubernetes.k8s_info:
-    api_version: operators.coreos.com/v1alpha1
-    kind: ClusterServiceVersion
-    namespace: openshift-nfd
-  register: csv_facts
-  until: >
-    csv_facts.resources | selectattr('status.phase', 'equalto', 'Succeeded') | list | length > 0
-  retries: 10
-  delay: 30
+# - name: Wait for NFD Operator to be installed
+#   community.kubernetes.k8s_info:
+#     api_version: operators.coreos.com/v1alpha1
+#     kind: ClusterServiceVersion
+#     namespace: openshift-nfd
+#   register: csv_facts
+#   until: >
+#     csv_facts.resources | selectattr('status.phase', 'equalto', 'Succeeded') | list | length > 0
+#   retries: 10
+#   delay: 30

@@ -43,7 +43,3 @@
   community.general.terraform:
     project_path: '{{ project_dir }}'
     state: present
-
-- name: Grab the terraform output and register
-  command: "terraform output -json > ./files/terraform_output.json"
-  register: terraform_output
