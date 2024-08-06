@@ -10,3 +10,4 @@ main.plan
 .terraform.tfstate.lock.info
 virtualenv/
 notes.md
+./ansible/roles/build_hcp/vars/bw_creds.yaml
