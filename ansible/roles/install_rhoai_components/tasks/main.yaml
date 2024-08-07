@@ -29,8 +29,6 @@
   community.okd.openshift_auth:
     host: "{{ cluster_api_url }}"
     username: "{{ cluster_admin }}"
-    # need to configure this to pull from vault if no vault, make sure the pw is set the same as 
-    # admin_p var in tfvars file
     password: "{{ admin_pw }}"  
     verify_ssl: false
   register: login

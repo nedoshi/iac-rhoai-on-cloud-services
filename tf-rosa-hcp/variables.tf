@@ -99,6 +99,7 @@ variable "developer_password" {
   EOF
   type        = string
   sensitive   = true
+  default     = ""
 }
 
 # S3 vars
