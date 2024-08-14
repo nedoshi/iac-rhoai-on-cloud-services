@@ -1,0 +1,24 @@
+---
+- name: what cluster am i destroying?
+  debug:
+    msg: |
+      ***************************************
+      Preparing to destroy {{ cluster_name }}.
+      This task may take up to an hour.
+      ***************************************
+    verbosity: 0
+
+- name: Destroy the ARO Cluster (This may take 30 minutes)
+  cloud.terraform.terraform:
+    project_path: "{{ tf_project_path }}"
+    state: absent
+    variables:
+      cluster_name: "{{ cluster_name }}"
+      resource_group_name: "{{ resource_group_name }}"
+      pull_secret_path: "{{ pull_secret_path }}"
+      subscription_id: "{{ subscription_id }}"
+      aro_version: "{{ aro_version }}"
+      location: "{{ location }}"
+      worker_node_count: "{{ worker_node_count }}"
+      tags: "{{ tags | to_json }}"
+  register: _tf

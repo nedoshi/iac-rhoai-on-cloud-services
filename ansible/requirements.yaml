@@ -9,3 +9,4 @@ collections:
   - name: community.okd
   - name: kubernetes.core
   - name: cloud.terraform
+  - name: azure.azcollection

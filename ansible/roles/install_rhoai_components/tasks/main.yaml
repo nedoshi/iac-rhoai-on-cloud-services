@@ -25,13 +25,39 @@
   debug:
     msg: "Cluster API URL: {{ cluster_api_url }}"
 
-- name: login to ROSA cluster
+- name: login to OCP cluster
   community.okd.openshift_auth:
     host: "{{ cluster_api_url }}"
-    username: "{{ cluster_admin }}"
+    username: "{{ admin_user | default(cluster_admin) }}"
     password: "{{ admin_pw }}"
-    verify_ssl: false
+    # verify_ssl: false
   register: login
+  retries: 10
+  delay: 60
+
+- name: check openshift version
+  kubernetes.core.k8s_info:
+    host: "{{ login.openshift_auth.host }}"
+    api_key: "{{ login.openshift_auth.api_key }}"
+    kind: clusterversion
+    name: version
+    api_version: config.openshift.io/v1
+  register: _ocp_version
+  # failed_when: false
+  # retries: 5
+  # delay: 60
+
+  # no_log: true
+
+- set_fact:
+    ocp_version: "{{ _ocp_version.resources[0].status.desired.version }}"
+  # no_log: true
+
+# - fail:
+#     msg: |
+#       apiVersion: -
+#       {{ _ocp_version.resources[0].status.desired.version | to_nice_yaml }}
+#       {{ ocp_version is version('4.15', '<') }}
 
 - include_tasks: "{{ item }}"
   with_items:
@@ -43,3 +69,15 @@
     kubeconfig: "{{ login.openshift_auth }}"
     api_key: "{{ login.openshift_auth.api_key }}"
     host: "{{ login.openshift_auth.host }}"
+
+- debug:
+    msg: |
+      OpenShift info
+
+      To log into the cluster run:
+
+        oc login {{ cluster_api_url }} --username "{{ admin_user }}" --password '{{ admin_pw }}'
+
+      The Red Hat OpenShift AI url is:
+
+        https://{{ rhoai_route }}

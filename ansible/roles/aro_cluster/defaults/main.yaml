@@ -1,0 +1,16 @@
+---
+tf_project_path: "../terraform/tf-aro"
+
+cluster_name: "{{ lookup('env','USER') }}-rhoai"
+resource_group_name: "{{ lookup('env','USER') }}-rhoai-rg"
+pull_secret_path: "~/Downloads/pull-secret.txt"
+subscription_id: ""
+aro_version: "4.14.16"
+location: southcentralus
+worker_node_count: 6
+aro_tags:
+  cost-center: CC468
+  service-phase: lab
+  app-code: MOBB-001
+  owner: "{{ lookup('env','USER') }}_redhat.com"
+  provisioner: Terraform
