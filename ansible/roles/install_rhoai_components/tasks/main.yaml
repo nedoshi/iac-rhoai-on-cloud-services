@@ -28,7 +28,7 @@
 - name: login to OCP cluster
   community.okd.openshift_auth:
     host: "{{ cluster_api_url }}"
-    username: "{{ admin_user | default(cluster_admin) }}"
+    username: "{{ admin_user }}"
     password: "{{ admin_pw }}"
     # verify_ssl: false
   register: login
