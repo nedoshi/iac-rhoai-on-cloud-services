@@ -20,5 +20,4 @@
       aro_version: "{{ aro_version }}"
       location: "{{ location }}"
       worker_node_count: "{{ worker_node_count }}"
-      tags: "{{ tags | to_json }}"
   register: _tf
