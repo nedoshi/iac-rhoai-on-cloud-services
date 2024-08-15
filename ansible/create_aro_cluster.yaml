@@ -11,13 +11,13 @@
       ansible.builtin.set_fact:
         state: present
 
-- name: Install ROSA HCP cluster
+- name: Install ARO cluster
   hosts: localhost
   connection:   local
   roles:
-    - role: hcp_cluster
+    - role: aro_cluster
     - role: install_rhoai_components
       vars:
-        admin_user: "admin"
-        admin_pw: "{{ tf_vars.admin_password }}"
-        cluster_api_url: "{{ rosa_cluster_api_url }}"
+        admin_pw: "{{ ocp_password }}"
+        admin_user: "{{ ocp_username }}"
+        cluster_api_url: "{{ cluster_api_url }}"

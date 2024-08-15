@@ -1,0 +1,36 @@
+.PHONY: help virtualenv kind image deploy
+
+CLUSTER_NAME ?= $(shell whoami)-test
+
+VIRTUALENV ?= ./virtualenv
+ANSIBLE = $(VIRTUALENV)/bin/ansible-playbook $(VERBOSITY) $(EXTRA_VARS)
+
+IGNORE_CERTS ?= false
+IGNORE_CERTS_OPTION=
+ifeq ($(IGNORE_CERTS), true)
+IGNORE_CERTS_OPTION = --ignore-certs
+endif
+
+.PHONY: venv
+venv:
+	LC_ALL=en_US.UTF-8 python3 -m venv $(VIRTUALENV)
+	$(VIRTUALENV)/bin/pip install --upgrade pip
+	$(VIRTUALENV)/bin/pip install -r requirements.txt
+	$(VIRTUALENV)/bin/pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
+	$(VIRTUALENV)/bin/ansible-galaxy collection install -r requirements.yaml $(IGNORE_CERTS_OPTION)
+
+.PHONY: create.hcp
+create.hcp:
+	$(VIRTUALENV)/bin/ansible-playbook -vvvv create_hcp_cluster.yaml
+
+.PHONY: destroy.hcp
+destroy.hcp:
+	$(VIRTUALENV)/bin/ansible-playbook -vvvv destroy_hcp_cluster.yaml
+
+.PHONY: create.aro
+create.aro:
+	$(VIRTUALENV)/bin/ansible-playbook -vvvv create_aro_cluster.yaml
+
+.PHONY: destroy.aro
+destroy.aro:
+	$(VIRTUALENV)/bin/ansible-playbook -vvvv destroy_aro_cluster.yaml

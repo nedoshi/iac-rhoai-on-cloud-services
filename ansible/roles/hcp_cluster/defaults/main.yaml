@@ -1,5 +1,5 @@
 ---
-tf_project_path: "../tf-rosa-hcp"
+tf_project_path: "../terraform/tf-rosa-hcp"
 
 tf_vars:
   # change the path to `~/.config/ocm/ocm.json` for linux hosts
@@ -18,9 +18,9 @@ tf_vars:
   bucket_names:
     - "{{ lookup('env','USER') }}-cluster-bucket1"
     - "{{ lookup('env','USER') }}-cluster-bucket2"
-  compute_machine_type: "p3.2xlarge"
-  secondary_machine_pool_name: "secondary-pool"
-  secondary_machine_pool_instance_type: "m5.xlarge"
+  compute_machine_type: "m5.xlarge"
+  secondary_machine_pool_name: "gpu-pool"
+  secondary_machine_pool_instance_type: "p3.2xlarge"
   secondary_machine_pool_replicas: 2
   vpc_cidr: "10.10.0.0/16"
   developer_password: ""

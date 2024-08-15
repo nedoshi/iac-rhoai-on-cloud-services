@@ -39,11 +39,23 @@ destroy:
 	export TF_VAR_admin_password="$$(bw get password cluster-admin)" && \
 	terraform destroy -var-file=main.tfvars
 
-ansible.create:
-	$(VIRTUALENV)/bin/ansible-playbook -vvvv ./ansible/create_hcp_cluster.yaml
+.PHONY: ansible.%
+ansible.%:
+	$(MAKE) -C ansible $*
 
-ansible.destroy:
-	$(VIRTUALENV)/bin/ansible-playbook -vvvv ./ansible/destroy_hcp_cluster.yaml
+# ansible.create.hcp:
+# 	cd ./ansible
+# 	$(VIRTUALENV)/bin/ansible-playbook -vvvv ./ansible/create_hcp_cluster.yaml
+
+# ansible.destroy.hcp:
+# 	cd ./ansible
+# 	$(VIRTUALENV)/bin/ansible-playbook -vvvv ./ansible/destroy_hcp_cluster.yaml
+
+
+
+# ansible.create.aro:
+# 	cd ./ansible
+# 	$(VIRTUALENV)/bin/ansible-playbook -vvvv ./ansible/create_aro_cluster.yaml
 
 # @. $(BITWARDEN_APIKEY_FILE); \
 # bw login --apikey; \
@@ -51,3 +63,14 @@ ansible.destroy:
 # export BW_PASSWORD=$$(bw unlock --passwordenv BW_PASSWORD --raw); \
 # cd ansible && \
 # $(VIRTUALENV)/bin/ansible-playbook install-operators.yaml -i localhost --extra-vars "cluster_name=$(CLUSTER_NAME)"
+
+tf.init.aro:
+	cd ./terraform/tf-aro
+	terraform init
+
+tf.create.aro: init
+	cd ./terraform/tf-aro
+	export TF_VAR_subscription_id="$(shell az account show --query id --output tsv)"
+	export TF_VAR_cluster_name="$(shell whoami)-aro"
+	terraform plan -out main.plan
+	terraform apply main.plan

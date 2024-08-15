@@ -11,6 +11,21 @@
       metadata:
         name: openshift-nfd
 
+- name: Create OperatorGroup for openshift-nfd
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
+    definition:
+      apiVersion: operators.coreos.com/v1
+      kind: OperatorGroup
+      metadata:
+        name: openshift-nfd-group
+        namespace: openshift-nfd
+      spec:
+        targetNamespaces:
+            - openshift-nfd
+
 - name: Create Subscription
   community.okd.k8s:
     host: "{{ host }}"

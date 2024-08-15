@@ -22,9 +22,6 @@
       metadata:
         name: redhat-ods-operator-group
         namespace: redhat-ods-operator
-      spec:
-        targetNamespaces:
-          - redhat-ods-operator
 
 - name: Create Subscription for OpenShift AI Operator
   community.okd.k8s:
@@ -44,9 +41,22 @@
         source: redhat-operators
         sourceNamespace: openshift-marketplace
 
-# replace this with a wait for resource
-- pause:
-    seconds: 120
+- name: wait for OpenShift AI Operator to be deployed
+  kubernetes.core.k8s_info:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    kind: Pod
+    wait: yes
+    namespace: redhat-ods-operator
+    label_selectors:
+      - "name=rhods-operator"
+    wait_sleep: 10
+    wait_timeout: 360
+
+# oc wait --for=jsonpath='{.status.replicas}'=1 deployment \
+#   -n redhat-ods-operator rhods-operator
+
+
 
 - name: Create Data Science Cluster
   community.okd.k8s:
@@ -86,3 +96,27 @@
             managementState: Managed
           workbenches:
             managementState: Managed
+
+- name: wait for OpenShift Data Science Cluster
+  kubernetes.core.k8s_info:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    kind: Pod
+    namespace: redhat-ods-applications
+    label_selectors:
+      - "app=rhods-dashboard"
+    wait_sleep: 10
+    wait_timeout: 360
+    wait: true
+
+- name: fetch Red Hat OpenShift AI url
+  kubernetes.core.k8s_info:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    kind: Route
+    namespace: redhat-ods-applications
+    name: rhods-dashboard
+  register: _rhods_dashboard
+
+- set_fact:
+    rhoai_route: "{{ _rhods_dashboard.resources[0].spec.host }}"
