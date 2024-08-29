@@ -3,7 +3,7 @@ locals {
 }
 
 module "rosa" {
-  source = "git::https://github.com/rh-mobb/terraform-rosa.git"
+  source = "git::https://github.com/rh-mobb/terraform-rosa.git?ref=v0.1.0"
   admin_password = var.admin_password
   cluster_name         = var.cluster_name
   private              = var.private

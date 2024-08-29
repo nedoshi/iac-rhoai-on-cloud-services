@@ -21,16 +21,20 @@ venv:
 
 .PHONY: create.hcp
 create.hcp:
-	$(VIRTUALENV)/bin/ansible-playbook -vvvv create_hcp_cluster.yaml
+	$(VIRTUALENV)/bin/ansible-playbook -vv create_hcp_cluster.yaml
 
 .PHONY: destroy.hcp
 destroy.hcp:
-	$(VIRTUALENV)/bin/ansible-playbook -vvvv destroy_hcp_cluster.yaml
+	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_hcp_cluster.yaml
 
 .PHONY: create.aro
 create.aro:
-	$(VIRTUALENV)/bin/ansible-playbook -vvvv create_aro_cluster.yaml
+	$(VIRTUALENV)/bin/ansible-playbook -vv create_aro_cluster.yaml
 
 .PHONY: destroy.aro
 destroy.aro:
-	$(VIRTUALENV)/bin/ansible-playbook -vvvv destroy_aro_cluster.yaml
+	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_aro_cluster.yaml
+
+.PHONY: rhoai
+rhoai:
+	$(VIRTUALENV)/bin/ansible-playbook -vv install_rhoai.yaml

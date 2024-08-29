@@ -20,7 +20,19 @@ Along with the cluster itself and RHOAI it will also deploy
 
 ## Installing
 
-This has been tested on MacOSX, but should also run fine on Linux (check )
+This has been tested on Mac OSX, but should also run fine on Linux
+
+**Prerequisites**
+
+- [ROSA cli](https://docs.openshift.com/rosa/rosa_install_access_delete_clusters/rosa_getting_started_iam/rosa-installing-rosa.html) (if ROSA)
+- [AZ](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) cli or [AWS](https://aws.amazon.com/cli/) cli
+- Python 3
+- [Terraform](https://developer.hashicorp.com/terraform/install) cli
+- Organization / Account on [Red Hat Hybrid Cloud Console](https://console.redhat.com)
+- Log into
+    - aws or azure
+    - `rosa login`
+
 
 **ROSA HCP**
 
@@ -31,6 +43,11 @@ This has been tested on MacOSX, but should also run fine on Linux (check )
 
 - `make ansible.venv`
 - `make ansible.create.aro`
+
+**RHOAI on an existing cluster**
+
+- `make ansible.venv`
+- `make rhoai`
 
 
 After the Ansible tasks have been sucessfully completed you should see the following output which will guide your next steps
