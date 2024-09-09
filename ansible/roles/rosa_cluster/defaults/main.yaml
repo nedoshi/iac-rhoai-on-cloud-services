@@ -1,7 +1,7 @@
 ---
-hcp_cluster_tf_project_path: "../terraform/tf-rosa-hcp"
+rosa_cluster_tf_project_path: "../terraform/tf-rosa"
 
-hcp_cluster_tf_vars:
+rosa_cluster_tf_vars:
   # change the path to `~/.config/ocm/ocm.json` for linux hosts
   token: "{{ (lookup('ansible.builtin.file', '~/Library/Application\ Support/ocm/ocm.json') | from_json).refresh_token | default('') }}"
   admin_password: 'Passw0rd12345!'
