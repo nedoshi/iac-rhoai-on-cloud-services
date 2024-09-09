@@ -9,9 +9,9 @@ module "rosa" {
   private              = var.private
   region               = var.region
   multi_az             = false
-  hosted_control_plane = true
-  replicas             = 2
-  max_replicas         = 4
+  hosted_control_plane = tobool(var.hcp)
+  replicas             = var.workers_replicas
+  max_replicas         = var.workers_replicas_max
   ocp_version          = var.ocp_version
   pod_cidr             = var.pod_cidr
   service_cidr         = var.service_cidr

@@ -21,6 +21,9 @@ hcp_cluster_tf_vars:
   compute_machine_type: "m5.xlarge"
   secondary_machine_pool_name: "gpu-pool"
   secondary_machine_pool_instance_type: "p4d.24xlarge"
-  secondary_machine_pool_replicas: 2
+  secondary_machine_pool_replicas: 1
+  workers_replicas: 6
+  workers_replicas_max: 6
+  hcp: "true"
   vpc_cidr: "10.10.0.0/16"
   developer_password: ""

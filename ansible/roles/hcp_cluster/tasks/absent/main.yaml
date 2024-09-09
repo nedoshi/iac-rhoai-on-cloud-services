@@ -16,3 +16,6 @@
       secondary_machine_pool_replicas: "{{ hcp_cluster_tf_vars.secondary_machine_pool_replicas }}"
       vpc_cidr: "{{ hcp_cluster_tf_vars.vpc_cidr }}"
       developer_password: "{{ hcp_cluster_tf_vars.developer_password }}"
+      workers_replicas: "{{ hcp_cluster_tf_vars.workers_replicas }}"
+      workers_replicas_max: "{{ hcp_cluster_tf_vars.workers_replicas_max }}"
+      hcp: "{{ hcp_cluster_tf_vars.hcp }}"
