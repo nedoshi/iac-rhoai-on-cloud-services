@@ -22,10 +22,10 @@
 #     cluster_api_url: "{{ rosa_json.value.cluster_api_url }}"
 
 - name: Debug cluster_api_url
-  debug:
+  ansible.builtin.debug:
     msg: "Cluster API URL: {{ cluster_api_url }}"
 
-- name: login to OCP cluster
+- name: Login to OCP cluster
   community.okd.openshift_auth:
     host: "{{ cluster_api_url }}"
     username: "{{ admin_user }}"
@@ -35,7 +35,7 @@
   retries: 10
   delay: 60
 
-- name: check openshift version
+- name: Check openshift version
   kubernetes.core.k8s_info:
     host: "{{ login.openshift_auth.host }}"
     api_key: "{{ login.openshift_auth.api_key }}"
@@ -49,7 +49,8 @@
 
   # no_log: true
 
-- set_fact:
+- name: Set OpenShift version fact
+  ansible.builtin.set_fact:
     ocp_version: "{{ _ocp_version.resources[0].status.desired.version }}"
   # no_log: true
 
@@ -59,7 +60,8 @@
 #       {{ _ocp_version.resources[0].status.desired.version | to_nice_yaml }}
 #       {{ ocp_version is version('4.15', '<') }}
 
-- include_tasks: "{{ item }}"
+- name: Include installation tasks for components
+  ansible.builtin.include_tasks: "{{ item }}"
   with_items:
     - install_other_operators.yaml
     - install_nfd.yaml
@@ -70,7 +72,8 @@
     api_key: "{{ login.openshift_auth.api_key }}"
     host: "{{ login.openshift_auth.host }}"
 
-- debug:
+- name: Display OpenShift login information
+  ansible.builtin.debug:
     msg: |
       OpenShift info
 

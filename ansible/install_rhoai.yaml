@@ -1,12 +1,12 @@
 ---
-- name:         "init"
-  hosts:        localhost
-  connection:   local
+- name: Init
+  hosts: localhost
+  connection: local
   gather_facts: true
   tags:
     - always
 
-- name: Install ROSA HCP cluster
+- name: Install RHOAI in cluster
   hosts: localhost
   # vars_files:
   #   - vars/bitwarden_creds.yml
@@ -14,6 +14,6 @@
   roles:
     - role: install_rhoai_components
       vars:
-        admin_user: "admin"
-        admin_pw: "{{ tf_vars.admin_password }}"
-        cluster_api_url: "{{ rosa_cluster_api_url }}"
+        install_rhoai_components_admin_user: "admin"
+        install_rhoai_components_admin_pw: "{{ tf_vars.admin_password }}"
+        install_rhoai_components_cluster_api_url: "{{ rosa_cluster_api_url }}"

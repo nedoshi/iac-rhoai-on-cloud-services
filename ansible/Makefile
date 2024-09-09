@@ -23,9 +23,13 @@ venv:
 create.hcp:
 	$(VIRTUALENV)/bin/ansible-playbook -vv create_hcp_cluster.yaml
 
-.PHONY: destroy.hcp
-destroy.hcp:
-	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_hcp_cluster.yaml
+.PHONY: create.rosa_classic
+create.rosa_classic:
+	$(VIRTUALENV)/bin/ansible-playbook -vv create_rosa_classic.yaml
+
+.PHONY: destroy.rosa
+destroy.rosa:
+	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_rosa_cluster.yaml
 
 .PHONY: create.aro
 create.aro:

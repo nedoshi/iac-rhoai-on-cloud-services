@@ -156,31 +156,31 @@
         source: redhat-operators
         sourceNamespace: openshift-marketplace
 
-- name: wait for OpenShift GitOps Operator to be deployed
+- name: Wait for OpenShift GitOps Operator to be deployed
   kubernetes.core.k8s_info:
     host: "{{ host }}"
     api_key: "{{ api_key }}"
     kind: Pod
-    wait: yes
+    wait: true
     namespace: openshift-gitops-operator
     label_selectors:
       - "control-plane=gitops-operator"
     wait_sleep: 10
     wait_timeout: 360
 
-- name: wait for OpenShift GitOps instance to be deployed
+- name: Wait for OpenShift GitOps instance to be deployed
   kubernetes.core.k8s_info:
     host: "{{ host }}"
     api_key: "{{ api_key }}"
     kind: Pod
-    wait: yes
+    wait: true
     namespace: openshift-gitops
     label_selectors:
       - "app.kubernetes.io/name=openshift-gitops-application-controller"
     wait_sleep: 10
     wait_timeout: 360
 
-- name: give permissions to OpenShift GitOps
+- name: Give permissions to OpenShift GitOps
   community.okd.k8s:
     host: "{{ host }}"
     api_key: "{{ api_key }}"
@@ -196,11 +196,12 @@
         kind: ClusterRole
         name: cluster-admin
       subjects:
-      - kind: ServiceAccount
-        name: openshift-gitops-argocd-application-controller
-        namespace: openshift-gitops
+        - kind: ServiceAccount
+          name: openshift-gitops-argocd-application-controller
+          namespace: openshift-gitops
 
-- when: ocp_version is version('4.15', '<')
+- name: Install Elasticsearch for OCP versions below 4.15
+  when: ocp_version is version('4.15', '<')
   block:
     - name: Create namespace for Elasticsearch
       community.okd.k8s:

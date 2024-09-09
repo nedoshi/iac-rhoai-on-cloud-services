@@ -1,7 +1,7 @@
 ---
 - name: Destroy the ROSA HCP Cluster (This may take 30 minutes)
   cloud.terraform.terraform:
-    project_path: "{{ tf_project_path }}"
+    project_path: "{{ rosa_cluster_tf_project_path }}"
     state: absent
     variables:
       token: "{{ rosa_cluster_tf_vars.token }}"
