@@ -1,4 +1,5 @@
 ---
+
 - name: Create the ROSA HCP Cluster (This may take 30 minutes)
   cloud.terraform.terraform:
     project_path: "{{ tf_project_path }}"
@@ -19,10 +20,18 @@
     force_init: true
   register: _tf
 
-- set_fact:
+- name: Set Cluster Login Credentials
+  ansible.builtin.set_fact:
     rosa_cluster_api_url: "{{ _tf.outputs.rosa.value.cluster_api_url }}"
 
-- debug:
+- name: Cluster Login
+  ansible.builtin.debug:
     msg: |
       to log into the cluster run:
         oc login {{ rosa_cluster_api_url }} --username admin --password '{{ tf_vars.admin_password }}'
+
+- name: Terraform Outputs
+  ansible.builtin.debug:
+    msg: |
+      here are the terraform outputs available to you for further extension of this automation:
+      {{ _tf.outputs }}

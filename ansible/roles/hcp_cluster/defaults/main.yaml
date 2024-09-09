@@ -20,7 +20,7 @@ tf_vars:
     - "{{ lookup('env','USER') }}-cluster-bucket2"
   compute_machine_type: "m5.xlarge"
   secondary_machine_pool_name: "gpu-pool"
-  secondary_machine_pool_instance_type: "p3.2xlarge"
+  secondary_machine_pool_instance_type: "p4d.24xlarge"
   secondary_machine_pool_replicas: 2
   vpc_cidr: "10.10.0.0/16"
   developer_password: ""
