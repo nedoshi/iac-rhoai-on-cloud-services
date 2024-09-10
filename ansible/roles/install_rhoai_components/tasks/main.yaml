@@ -1,25 +1,5 @@
 ---
 
-# - name: Get ROSA cluster api url from terraform outputs
-#   command: "terraform output -json"
-#   args:
-#     chdir: "{{ terraform_dir }}"
-#   register: tf_output
-
-# - name: extract ROSA section
-#   set_fact:
-#     rosa_output: "{{ tf_output.stdout | from_json | json_query('rosa') }}"
-
-# - name: Convert ROSA output to valid JSON
-#   set_fact:
-#     rosa_json: >-
-#       {{
-#         rosa_output | to_json | replace('=', ':') | replace('tolist(', '') | replace(')', '') | from_json
-#       }}
-
-# - name: Extract cluster_api_url
-#   set_fact:
-#     cluster_api_url: "{{ rosa_json.value.cluster_api_url }}"
 
 - name: Debug cluster_api_url
   ansible.builtin.debug:
@@ -43,22 +23,11 @@
     name: version
     api_version: config.openshift.io/v1
   register: _ocp_version
-  # failed_when: false
-  # retries: 5
-  # delay: 60
 
-  # no_log: true
 
 - name: Set OpenShift version fact
   ansible.builtin.set_fact:
     ocp_version: "{{ _ocp_version.resources[0].status.desired.version }}"
-  # no_log: true
-
-# - fail:
-#     msg: |
-#       apiVersion: -
-#       {{ _ocp_version.resources[0].status.desired.version | to_nice_yaml }}
-#       {{ ocp_version is version('4.15', '<') }}
 
 - name: Include installation tasks for components
   ansible.builtin.include_tasks: "{{ item }}"
