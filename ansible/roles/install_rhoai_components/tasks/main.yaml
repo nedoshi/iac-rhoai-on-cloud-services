@@ -23,13 +23,13 @@
 
 - name: Debug cluster_api_url
   ansible.builtin.debug:
-    msg: "Cluster API URL: {{ cluster_api_url }}"
+    msg: "Cluster API URL: {{ rosa_cluster_api_url }}"
 
 - name: Login to OCP cluster
   community.okd.openshift_auth:
-    host: "{{ cluster_api_url }}"
-    username: "{{ admin_user }}"
-    password: "{{ admin_pw }}"
+    host: "{{ rosa_cluster_api_url }}"
+    username: "{{ install_rhoai_components_admin_user }}"
+    password: "{{ rosa_cluster_tf_vars.admin_password }}"
     # verify_ssl: false
   register: login
   retries: 10
@@ -79,7 +79,7 @@
 
       To log into the cluster run:
 
-        oc login {{ cluster_api_url }} --username "{{ admin_user }}" --password '{{ admin_pw }}'
+        oc login {{ rosa_cluster_api_url }} --username "{{ install_rhoai_components_admin_user }}" --password '{{ install_rhoai_components_admin_pw }}'
 
       The Red Hat OpenShift AI url is:
 

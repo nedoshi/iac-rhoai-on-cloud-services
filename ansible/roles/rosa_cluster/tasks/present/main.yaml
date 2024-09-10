@@ -1,5 +1,28 @@
 ---
 
+- name: Create Main.tf file
+  ansible.builtin.template:
+    src: terraform_config.tf.j2
+    dest: "{{ rosa_cluster_tf_project_path }}/main.tf"
+    mode: '0644'
+  vars:
+    hcp: "{{ rosa_cluster_tf_vars.hcp }}"
+    secondary_machine_pool_name: "{{ rosa_cluster_tf_vars.secondary_machine_pool_name }}"
+    secondary_machine_pool_instance_type: "{{ rosa_cluster_tf_vars.secondary_machine_pool_instance_type }}"
+    secondary_machine_pool_replicas: "{{ rosa_cluster_tf_vars.secondary_machine_pool_replicas }}"
+
+- name: Create outputs.tf file
+  ansible.builtin.template:
+    src: terraform_outputs.tf.j2
+    dest: "{{ rosa_cluster_tf_project_path }}/outputs.tf"
+    mode: '0644'
+  vars:
+    hcp: "{{ rosa_cluster_tf_vars.hcp }}"
+    secondary_machine_pool_name: "{{ rosa_cluster_tf_vars.secondary_machine_pool_name }}"
+    secondary_machine_pool_instance_type: "{{ rosa_cluster_tf_vars.secondary_machine_pool_instance_type }}"
+    secondary_machine_pool_replicas: "{{ rosa_cluster_tf_vars.secondary_machine_pool_replicas }}"
+
+
 - name: Create the ROSA HCP Cluster (This may take 30 minutes)
   cloud.terraform.terraform:
     project_path: "{{ rosa_cluster_tf_project_path }}"
@@ -21,8 +44,8 @@
       workers_replicas_max: "{{ rosa_cluster_tf_vars.workers_replicas_max }}"
       hcp: "{{ rosa_cluster_tf_vars.hcp }}"
     force_init: true
-    environment:
-      TF_WARN_OUTPUT_ERRORS=1
+  environment:
+    TF_WARN_OUTPUT_ERRORS: '1'
   register: _tf
 
 - name: Set Cluster Login Credentials

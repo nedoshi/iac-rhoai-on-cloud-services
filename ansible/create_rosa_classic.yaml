@@ -23,5 +23,5 @@
     - role: install_rhoai_components
       vars:
         install_rhoai_components_admin_user: "admin"
-        install_rhoai_components_admin_pw: "{{ tf_vars.admin_password }}"
+        install_rhoai_components_admin_pw: "{{ rosa_cluster_tf_vars.admin_password }}"
         install_rhoai_components_cluster_api_url: "{{ rosa_cluster_api_url }}"

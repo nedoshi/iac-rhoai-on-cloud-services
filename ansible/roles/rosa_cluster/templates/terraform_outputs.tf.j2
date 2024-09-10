@@ -3,6 +3,7 @@ output "bucket_names" {
   value = [for bucket in aws_s3_bucket.multiple_buckets : bucket.bucket]
 }
 
+{% if hcp | bool %}
 output "secondary_machine_pool_name" {
   value = rhcs_hcp_machine_pool.secondary_machine_pool.name
 }
@@ -15,6 +16,19 @@ output "secondary_machine_pool_replicas" {
   value = rhcs_hcp_machine_pool.secondary_machine_pool.autoscaling.enabled ? "Autoscaling enabled" : "Autoscaling disabled"
 }
 
+{% else %}
+output "secondary_machine_pool_name" {
+  value = rhcs_machine_pool.secondary_machine_pool.name
+}
+
+output "secondary_machine_pool_instance_type" {
+  value = rhcs_machine_pool.secondary_machine_pool.machine_type
+}
+
+output "secondary_machine_pool_replicas" {
+  value = rhcs_machine_pool.secondary_machine_pool.autoscaling_enabled ? "Autoscaling enabled" : "Autoscaling disabled"
+}
+{% endif %}
 
 output "rosa" {
   value = module.rosa
