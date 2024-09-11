@@ -19,7 +19,7 @@
       vars:
         rosa_cluster_tf_vars:
           hcp: "false"
-          cluster_name: "{{ lookup('env', 'USER') }}-rhoai-c"
+          cluster_name: "{{ lookup('env', 'USER') }}-rhoai"
     - role: install_rhoai_components
       vars:
         install_rhoai_components_admin_user: "admin"
