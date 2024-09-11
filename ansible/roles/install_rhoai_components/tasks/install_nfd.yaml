@@ -24,7 +24,7 @@
         namespace: openshift-nfd
       spec:
         targetNamespaces:
-            - openshift-nfd
+          - openshift-nfd
 
 - name: Create Subscription
   community.okd.k8s:

@@ -1,5 +1,5 @@
 ---
-- name: "Init"
+- name: Init
   hosts: localhost
   connection: local
   gather_facts: true
@@ -11,14 +11,15 @@
       ansible.builtin.set_fact:
         state: present
 
-- name: Install ROSA HCP cluster
+- name: Install ROSA Classic cluster
   hosts: localhost
   connection: local
   roles:
     - role: rosa_cluster
       vars:
         rosa_cluster_tf_vars:
-          hcp: "true"
+          hcp: "false"
+          cluster_name: "{{ lookup('env', 'USER') }}-rhoai"
     - role: install_rhoai_components
       vars:
         install_rhoai_components_admin_user: "admin"

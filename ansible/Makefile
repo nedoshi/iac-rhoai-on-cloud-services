@@ -14,18 +14,22 @@ endif
 .PHONY: venv
 venv:
 	LC_ALL=en_US.UTF-8 python3 -m venv $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install --upgrade pip
-	$(VIRTUALENV)/bin/pip install -r requirements.txt
-	$(VIRTUALENV)/bin/pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
-	$(VIRTUALENV)/bin/ansible-galaxy collection install -r requirements.yaml $(IGNORE_CERTS_OPTION)
+	$(VIRTUALENV)/bin/pip install --upgrade pip setuptools wheel
+	$(VIRTUALENV)/bin/pip install --only-binary=:all: -r requirements.txt || $(VIRTUALENV)/bin/pip install -r requirements.txt
+	$(VIRTUALENV)/bin/pip install --only-binary=:all: -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt || $(VIRTUALENV)/bin/pip install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
+	$(VIRTUALENV)/bin/ansible-galaxy install -r requirements.yaml $(IGNORE_CERTS_OPTION)
 
 .PHONY: create.hcp
 create.hcp:
 	$(VIRTUALENV)/bin/ansible-playbook -vv create_hcp_cluster.yaml
 
-.PHONY: destroy.hcp
-destroy.hcp:
-	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_hcp_cluster.yaml
+.PHONY: create.rosa_classic
+create.rosa_classic:
+	$(VIRTUALENV)/bin/ansible-playbook -vv create_rosa_classic.yaml
+
+.PHONY: destroy.rosa
+destroy.rosa:
+	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_rosa_cluster.yaml
 
 .PHONY: create.aro
 create.aro:

@@ -1,6 +1,5 @@
 ---
 
-cluster_api_url: ""
-terraform_dir: "/Users/cwooley/projects/tf-rosa-hcp-rhoai/tf-rosa-hcp"
-admin_user: "admin"
-admin_pw: "xxxxxxxXXXXXXX."
+install_rhoai_components_cluster_api_url: ""
+install_rhoai_components_admin_user: "admin"
+install_rhoai_components_admin_pw: "xxxxxxxXXXXXXX."

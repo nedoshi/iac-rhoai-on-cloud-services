@@ -1,41 +1,21 @@
 ---
 
-# - name: Get ROSA cluster api url from terraform outputs
-#   command: "terraform output -json"
-#   args:
-#     chdir: "{{ terraform_dir }}"
-#   register: tf_output
-
-# - name: extract ROSA section
-#   set_fact:
-#     rosa_output: "{{ tf_output.stdout | from_json | json_query('rosa') }}"
-
-# - name: Convert ROSA output to valid JSON
-#   set_fact:
-#     rosa_json: >-
-#       {{
-#         rosa_output | to_json | replace('=', ':') | replace('tolist(', '') | replace(')', '') | from_json
-#       }}
-
-# - name: Extract cluster_api_url
-#   set_fact:
-#     cluster_api_url: "{{ rosa_json.value.cluster_api_url }}"
 
 - name: Debug cluster_api_url
-  debug:
-    msg: "Cluster API URL: {{ cluster_api_url }}"
+  ansible.builtin.debug:
+    msg: "Cluster API URL: {{ rosa_cluster_api_url }}"
 
-- name: login to OCP cluster
+- name: Login to OCP cluster
   community.okd.openshift_auth:
-    host: "{{ cluster_api_url }}"
-    username: "{{ admin_user }}"
-    password: "{{ admin_pw }}"
+    host: "{{ rosa_cluster_api_url }}"
+    username: "{{ install_rhoai_components_admin_user }}"
+    password: "{{ rosa_cluster_tf_vars.admin_password }}"
     # verify_ssl: false
   register: login
   retries: 10
   delay: 60
 
-- name: check openshift version
+- name: Check openshift version
   kubernetes.core.k8s_info:
     host: "{{ login.openshift_auth.host }}"
     api_key: "{{ login.openshift_auth.api_key }}"
@@ -43,23 +23,14 @@
     name: version
     api_version: config.openshift.io/v1
   register: _ocp_version
-  # failed_when: false
-  # retries: 5
-  # delay: 60
 
-  # no_log: true
 
-- set_fact:
+- name: Set OpenShift version fact
+  ansible.builtin.set_fact:
     ocp_version: "{{ _ocp_version.resources[0].status.desired.version }}"
-  # no_log: true
 
-# - fail:
-#     msg: |
-#       apiVersion: -
-#       {{ _ocp_version.resources[0].status.desired.version | to_nice_yaml }}
-#       {{ ocp_version is version('4.15', '<') }}
-
-- include_tasks: "{{ item }}"
+- name: Include installation tasks for components
+  ansible.builtin.include_tasks: "{{ item }}"
   with_items:
     - install_other_operators.yaml
     - install_nfd.yaml
@@ -70,13 +41,14 @@
     api_key: "{{ login.openshift_auth.api_key }}"
     host: "{{ login.openshift_auth.host }}"
 
-- debug:
+- name: Display OpenShift login information
+  ansible.builtin.debug:
     msg: |
       OpenShift info
 
       To log into the cluster run:
 
-        oc login {{ cluster_api_url }} --username "{{ admin_user }}" --password '{{ admin_pw }}'
+        oc login {{ rosa_cluster_api_url }} --username "{{ install_rhoai_components_admin_user }}" --password '{{ install_rhoai_components_admin_pw }}'
 
       The Red Hat OpenShift AI url is:
 

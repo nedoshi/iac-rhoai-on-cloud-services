@@ -1,0 +1,8 @@
+---
+- name: "Run hcp_cluster present tasks"
+  ansible.builtin.import_tasks: present/main.yaml
+  when: state == 'present'
+
+- name: "Run hcp_cluster absent tasks"
+  ansible.builtin.import_tasks: absent/main.yaml
+  when: state == 'absent'

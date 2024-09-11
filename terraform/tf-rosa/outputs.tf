@@ -15,6 +15,11 @@ output "secondary_machine_pool_replicas" {
   value = rhcs_hcp_machine_pool.secondary_machine_pool.autoscaling.enabled ? "Autoscaling enabled" : "Autoscaling disabled"
 }
 
+
 output "rosa" {
   value = module.rosa
 }
+
+
+# added to the jinja template for main.tf, still getting errors with the buckets
+

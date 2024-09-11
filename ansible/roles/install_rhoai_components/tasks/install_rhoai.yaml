@@ -41,12 +41,12 @@
         source: redhat-operators
         sourceNamespace: openshift-marketplace
 
-- name: wait for OpenShift AI Operator to be deployed
+- name: Wait for OpenShift AI Operator to be deployed
   kubernetes.core.k8s_info:
     host: "{{ host }}"
     api_key: "{{ api_key }}"
     kind: Pod
-    wait: yes
+    wait: true
     namespace: redhat-ods-operator
     label_selectors:
       - "name=rhods-operator"
@@ -55,9 +55,6 @@
 
 # oc wait --for=jsonpath='{.status.replicas}'=1 deployment \
 #   -n redhat-ods-operator rhods-operator
-
-
-
 - name: Create Data Science Cluster
   community.okd.k8s:
     host: "{{ host }}"
@@ -97,7 +94,7 @@
           workbenches:
             managementState: Managed
 
-- name: wait for OpenShift Data Science Cluster
+- name: Wait for OpenShift Data Science Cluster
   kubernetes.core.k8s_info:
     host: "{{ host }}"
     api_key: "{{ api_key }}"
@@ -109,7 +106,7 @@
     wait_timeout: 360
     wait: true
 
-- name: fetch Red Hat OpenShift AI url
+- name: Fetch Red Hat OpenShift AI url
   kubernetes.core.k8s_info:
     host: "{{ host }}"
     api_key: "{{ api_key }}"
@@ -118,5 +115,6 @@
     name: rhods-dashboard
   register: _rhods_dashboard
 
-- set_fact:
+- name: Set RHOAI dashboard route fact
+  ansible.builtin.set_fact:
     rhoai_route: "{{ _rhods_dashboard.resources[0].spec.host }}"

@@ -8,7 +8,8 @@
   changed_when: False
   no_log: true
 
-- fail:
+- name: Fail if cluster provisioning failed
+  ansible.builtin.fail:
     msg: |
       Cluster {{ resource_group_name }} failed to provision.
       Cluster Status:
@@ -16,7 +17,8 @@
   when: (_aro_check.clusters != {}) and
         (_aro_check.clusters.properties.provisioningState == "Failed")
 
-- debug:
+- name: Fail if cluster already exists
+  ansible.builtin.fail:
     msg: |
       A cluster with the name {{ resource_group_name }} already exists.
       Skipping cluster Creation.
@@ -25,7 +27,7 @@
 - when:
     - _aro_check.clusters == {}
   block:
-    - name: what cluster am i creating?
+    - name: What cluster am i creating?
       debug:
         msg: |
           ***************************************
@@ -48,16 +50,18 @@
           worker_node_count: "{{ worker_node_count }}"
           tags: "{{ aro_tags | to_json }}"
         force_init: true
+        environment:
+          TF_WARN_OUTPUT_ERRORS=1
       register: _tf
 
-- name: get credentials
+- name: Get credentials
   azure_rm_openshiftmanagedcluster_credentials_info:
     resource_group: "{{ resource_group_name }}"
     name: "{{ cluster_name }}"
   register: _aro_creds
   no_log: true
 
-- name: get cluster details
+- name: Get cluster details
   azure.azcollection.azure_rm_openshiftmanagedcluster_info:
     resource_group: "{{ resource_group_name }}"
     name: "{{ cluster_name }}"
@@ -66,13 +70,14 @@
   changed_when: False
   no_log: true
 
-- set_fact:
+- name: Set facts
+  ansible.builtin.set_fact:
     cluster_api_url: "{{ _aro_info.clusters.properties.apiserverProfile.url }}"
     ocp_username: "{{ _aro_creds.credentials.kubeadminUsername }}"
     ocp_password: "{{ _aro_creds.credentials.kubeadminPassword }}"
-  no_log: true
 
-- debug:
+- name: Cluster Login
+  ansible.builtin.debug:
     msg: |
       to log into the cluster run:
         oc login {{ cluster_api_url }} --username "{{ ocp_username }}" --password '{{ ocp_password }}'
