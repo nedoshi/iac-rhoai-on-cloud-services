@@ -3,3 +3,6 @@
 install_rhoai_components_cluster_api_url: ""
 install_rhoai_components_admin_user: "admin"
 install_rhoai_components_admin_pw: "xxxxxxxXXXXXXX."
+
+install_rhoai_components_intel_gpus: false
+install_rhoai_components_nvidia_gpus: true

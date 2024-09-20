@@ -1,0 +1,34 @@
+---
+- name: Init
+  hosts: bastion
+  # connection: local
+  gather_facts: true
+  tags:
+    - always
+  tasks:
+    - pip:
+        name:
+          - oauthlib==3.2.0
+          - requests-oauthlib
+          - openshift>=0.13.1
+
+- name: Install RHOAI in cluster
+  hosts: bastion
+  # vars_prompt:
+  #   - name: rosa_api_url
+  #     private: false
+  #     prompt: What is your ROSA API URL ?
+  #   - name: rosa_admin_user
+  #     prompt: What is your ROSA Admin username ?
+  #     private: false
+  #   - name: rosa_admin_pass
+  #     prompt: What is your ROSA Admin password ?
+  roles:
+    - role: install_rhoai_components
+      vars:
+        install_rhoai_components_admin_user: "{{ rosa_admin_user }}"
+        install_rhoai_components_admin_pw: "{{ rosa_admin_pass }}"
+        install_rhoai_components_cluster_api_url: "{{ rosa_api_url }}"
+
+
+# rosa create machinepool -c 2dov22q6uuuh7a37l91s5tcjg8a62j1f --name=intel-amx --replicas=2 --instance-type=m7i.4xlarge

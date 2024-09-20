@@ -19,26 +19,18 @@ venv:
 	$(VIRTUALENV)/bin/pip install --only-binary=:all: -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt || $(VIRTUALENV)/bin/pip install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
 	$(VIRTUALENV)/bin/ansible-galaxy install -r requirements.yaml $(IGNORE_CERTS_OPTION)
 
-.PHONY: create.hcp
-create.hcp:
-	$(VIRTUALENV)/bin/ansible-playbook -vv create_hcp_cluster.yaml
+.PHONY: create.%
+create.%:
+	$(VIRTUALENV)/bin/ansible-playbook -vv -i ./environment/$*/hosts create_cluster.yaml
 
-.PHONY: create.rosa_classic
-create.rosa_classic:
-	$(VIRTUALENV)/bin/ansible-playbook -vv create_rosa_classic.yaml
-
-.PHONY: destroy.rosa
-destroy.rosa:
-	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_rosa_cluster.yaml
-
-.PHONY: create.aro
-create.aro:
-	$(VIRTUALENV)/bin/ansible-playbook -vv create_aro_cluster.yaml
-
-.PHONY: destroy.aro
-destroy.aro:
-	$(VIRTUALENV)/bin/ansible-playbook -vv destroy_aro_cluster.yaml
+.PHONY: destroy.%
+destroy.%:
+	$(VIRTUALENV)/bin/ansible-playbook -vv -i ./environment/$*/hosts destroy_cluster.yaml
 
 .PHONY: rhoai
 rhoai:
 	$(VIRTUALENV)/bin/ansible-playbook -vv install_rhoai.yaml
+
+.PHONY: bastion.rhoai
+bastion.rhoai:
+	$(VIRTUALENV)/bin/ansible-playbook --ask-pass -vv bastion_install_rhoai.yaml

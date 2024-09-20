@@ -1,60 +1,50 @@
 ---
+- name: install nfd terminal operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: rhods-operator
+    operator_namespace: redhat-ods-operator
+    operator_channel: fast
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
+    operator_wait: true
 
-- name: Ensure the redhat-ods-operator namespace exists
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: redhat-ods-operator
-
-- name: Create OperatorGroup for OpenShift AI Operator
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    state: present
-    definition:
-      apiVersion: operators.coreos.com/v1
-      kind: OperatorGroup
-      metadata:
-        name: redhat-ods-operator-group
-        namespace: redhat-ods-operator
-
-- name: Create Subscription for OpenShift AI Operator
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    state: present
-    definition:
-      apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: rhods-operator
-        namespace: redhat-ods-operator
-      spec:
-        channel: fast
-        installPlanApproval: Automatic
-        name: rhods-operator
-        source: redhat-operators
-        sourceNamespace: openshift-marketplace
+# - name: Create Subscription for OpenShift AI Operator
+#   community.okd.k8s:
+#     host: "{{ host }}"
+#     api_key: "{{ api_key }}"
+#     state: present
+#     definition:
+#       apiVersion: operators.coreos.com/v1alpha1
+#       kind: Subscription
+#       metadata:
+#         name: rhods-operator
+#         namespace: redhat-ods-operator
+#       spec:
+#         channel: fast
+#         installPlanApproval: Automatic
+#         name: rhods-operator
+#         source: redhat-operators
+#         sourceNamespace: openshift-marketplace
 
 - name: Wait for OpenShift AI Operator to be deployed
   kubernetes.core.k8s_info:
     host: "{{ host }}"
     api_key: "{{ api_key }}"
-    kind: Pod
-    wait: true
+    kind: subscription
+    api_version: operators.coreos.com/v1alpha1
+    name: rhods-operator
     namespace: redhat-ods-operator
-    label_selectors:
-      - "name=rhods-operator"
+    wait_condition:
+      reason: AllCatalogSourcesHealthy
+      status: False
+      type: CatalogSourcesUnhealthy
     wait_sleep: 10
     wait_timeout: 360
+  no_log: true
 
-# oc wait --for=jsonpath='{.status.replicas}'=1 deployment \
-#   -n redhat-ods-operator rhods-operator
 - name: Create Data Science Cluster
   community.okd.k8s:
     host: "{{ host }}"
@@ -105,6 +95,27 @@
     wait_sleep: 10
     wait_timeout: 360
     wait: true
+
+- name: create accelorator profile for nvidia
+  when: install_rhoai_components_nvidia_gpus | bool
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
+    definition:
+      apiVersion: dashboard.opendatahub.io/v1
+      kind: AcceleratorProfile
+      metadata:
+        name: nvidia-gpu
+        namespace: redhat-ods-applications
+      spec:
+        displayName: NVIDIA GPU
+        enabled: true
+        identifier: nvidia.com/gpu
+        tolerations:
+        - effect: NoSchedule
+          key: nvidia.com/gpu
+          operator: Exists
 
 - name: Fetch Red Hat OpenShift AI url
   kubernetes.core.k8s_info:

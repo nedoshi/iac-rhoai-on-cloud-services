@@ -1,0 +1,3 @@
+
+[nodes]
+bastion rosa_api_url=https://api.rosa-4zzjp.sd56.p3.openshiftapps.com:443 rosa_admin_user=cluster-admin rosa_admin_pass=xEaDj-2qyuB-QM8Na-mgjLr

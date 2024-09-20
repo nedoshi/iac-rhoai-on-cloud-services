@@ -41,7 +41,7 @@ resource "rhcs_hcp_machine_pool" "secondary_machine_pool" {
     autoscaling = {
       enabled = false
     }
-    replicas = 2
+    replicas = var.secondary_machine_pool_replicas
     aws_node_pool = {
       instance_type = var.secondary_machine_pool_instance_type
       tags          = var.tags

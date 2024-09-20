@@ -5,11 +5,13 @@
   gather_facts: true
   tags:
     - always
+  vars:
+    ansible_python_interpreter: ./virtualenv/bin/python
 
 - name: Install RHOAI in cluster
   hosts: localhost
-  # vars_files:
-  #   - vars/bitwarden_creds.yml
+  vars:
+    ansible_python_interpreter: ./virtualenv/bin/python
 
   roles:
     - role: install_rhoai_components

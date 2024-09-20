@@ -18,7 +18,7 @@
         (_aro_check.clusters.properties.provisioningState == "Failed")
 
 - name: Fail if cluster already exists
-  ansible.builtin.fail:
+  ansible.builtin.debug:
     msg: |
       A cluster with the name {{ resource_group_name }} already exists.
       Skipping cluster Creation.
@@ -50,8 +50,8 @@
           worker_node_count: "{{ worker_node_count }}"
           tags: "{{ aro_tags | to_json }}"
         force_init: true
-        environment:
-          TF_WARN_OUTPUT_ERRORS=1
+      environment:
+        TF_WARN_OUTPUT_ERRORS: '1'
       register: _tf
 
 - name: Get credentials
@@ -75,6 +75,14 @@
     cluster_api_url: "{{ _aro_info.clusters.properties.apiserverProfile.url }}"
     ocp_username: "{{ _aro_creds.credentials.kubeadminUsername }}"
     ocp_password: "{{ _aro_creds.credentials.kubeadminPassword }}"
+
+- name: make sure OpenShift API url is signed with a valid cert
+  uri:
+    url: "{{ cluster_api_url }}"
+  register: _api_check
+  failed_when: _api_check.status != 403
+  retries: 10
+  delay: 30
 
 - name: Cluster Login
   ansible.builtin.debug:

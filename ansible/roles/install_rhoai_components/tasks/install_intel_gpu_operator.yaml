@@ -1,0 +1,83 @@
+---
+- name: install intel device plugins operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: intel-device-plugins-operator
+    operator_namespace: openshift-operators
+    operator_channel: alpha
+    operator_install_plan_approval: Automatic
+    operator_source: certified-operators
+    operator_source_namespace: openshift-marketplace
+    operator_wait: true
+
+- name: Create Intel QAT CR
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
+    definition:
+      apiVersion: deviceplugin.intel.com/v1
+      kind: QatDevicePlugin
+      metadata:
+        name: qatdeviceplugin-sample
+      spec:
+        nodeSelector:
+          intel.feature.node.kubernetes.io/qat: 'true'
+        kernelVfDrivers:
+          - 4xxxvf
+        dpdkDriver: vfio-pci
+        image: 'registry.connect.redhat.com/intel/intel-qat-plugin@sha256:540d5aa47bc2e1058a3a0a437b9ba31e6c0803f0fb5f3d1c539d990f74006b99'
+        initImage: 'registry.connect.redhat.com/intel/intel-qat-initcontainer@sha256:43532ade63c5930c80480a23c45ea14c61d298fbe9cd76dcd52080680811e1c5'
+        logLevel: 4
+        maxNumDevices: 128
+
+- name: Create Node Feature Rule for Intel
+  community.okd.k8s:
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    state: present
+    definition:
+      apiVersion: nfd.openshift.io/v1alpha1
+      kind: NodeFeatureRule
+      metadata:
+        name: intel-dp-devices
+        namespace: openshift-nfd
+      spec:
+        rules:
+          - name: "intel.gpu"
+            labels:
+              "intel.feature.node.kubernetes.io/gpu": "true"
+            matchFeatures:
+              - feature: pci.device
+                matchExpressions:
+                  vendor: {op: In, value: ["8086"]}
+                  class: {op: In, value: ["0300", "0380"]}
+          - name: "intel.qat"
+            labels:
+              "intel.feature.node.kubernetes.io/qat": "true"
+            matchFeatures:
+              - feature: pci.device
+                matchExpressions:
+                  vendor: {op: In, value: ["8086"]}
+                  device: {op: In, value: ["4940", "4942", "4944"]}
+                  class: {op: In, value: ["0b40"]}
+              - feature: kernel.loadedmodule
+                matchExpressions:
+                  intel_qat: {op: Exists}
+          - name: "intel.sgx"
+            labels:
+              "intel.feature.node.kubernetes.io/sgx": "true"
+            extendedResources:
+              sgx.intel.com/epc: "@cpu.security.sgx.epc"
+            matchFeatures:
+              - feature: cpu.cpuid
+                matchExpressions:
+                  SGX: {op: Exists}
+                  SGXLC: {op: Exists}
+              - feature: cpu.security
+                matchExpressions:
+                  sgx.enabled: {op: IsTrue}
+              - feature: kernel.config
+                matchExpressions:
+                  X86_SGX: {op: Exists}

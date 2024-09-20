@@ -1,0 +1,4 @@
+---
+cluster_type: rosa_hcp
+install_rhoai_components_intel_gpus: true
+install_rhoai_components_nvidia_gpus: true

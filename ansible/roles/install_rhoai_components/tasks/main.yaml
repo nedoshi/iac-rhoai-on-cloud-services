@@ -3,17 +3,26 @@
 
 - name: Debug cluster_api_url
   ansible.builtin.debug:
-    msg: "Cluster API URL: {{ rosa_cluster_api_url }}"
+    msg: |
+      Cluster API URL: {{ install_rhoai_components_cluster_api_url }}
+      host: "{{ install_rhoai_components_cluster_api_url }}"
+      username: "{{ install_rhoai_components_admin_user }}"
+      password: "{{ install_rhoai_components_admin_pw }}"
 
 - name: Login to OCP cluster
   community.okd.openshift_auth:
-    host: "{{ rosa_cluster_api_url }}"
+    host: "{{ install_rhoai_components_cluster_api_url }}"
     username: "{{ install_rhoai_components_admin_user }}"
-    password: "{{ rosa_cluster_tf_vars.admin_password }}"
-    # verify_ssl: false
+    password: "{{ install_rhoai_components_admin_pw }}"
+    verify_ssl: false
   register: login
   retries: 10
   delay: 60
+
+- set_fact:
+    kubeconfig: "{{ login.openshift_auth }}"
+    api_key: "{{ login.openshift_auth.api_key }}"
+    host: "{{ login.openshift_auth.host }}"
 
 - name: Check openshift version
   kubernetes.core.k8s_info:
@@ -22,24 +31,29 @@
     kind: clusterversion
     name: version
     api_version: config.openshift.io/v1
-  register: _ocp_version
+  register: _ocp_version_info
 
 
 - name: Set OpenShift version fact
   ansible.builtin.set_fact:
-    ocp_version: "{{ _ocp_version.resources[0].status.desired.version }}"
+    _ocp_version: "{{ _ocp_version_info.resources[0].status.desired.version }}"
 
 - name: Include installation tasks for components
   ansible.builtin.include_tasks: "{{ item }}"
   with_items:
     - install_other_operators.yaml
     - install_nfd.yaml
-    - install_nvidia_gpu_operator.yaml
-    - install_rhoai.yaml
-  vars:
-    kubeconfig: "{{ login.openshift_auth }}"
-    api_key: "{{ login.openshift_auth.api_key }}"
-    host: "{{ login.openshift_auth.host }}"
+
+- name: Deploy NVidia GPU Operator
+  when: install_rhoai_components_nvidia_gpus | bool
+  ansible.builtin.include_tasks: install_nvidia_gpu_operator.yaml
+
+- name: Deploy Intel GPU Operator
+  when: install_rhoai_components_intel_gpus | bool
+  ansible.builtin.include_tasks: install_intel_gpu_operator.yaml
+
+- name: Deploy OpenShift AI
+  ansible.builtin.include_tasks: install_rhoai.yaml
 
 - name: Display OpenShift login information
   ansible.builtin.debug:
@@ -48,8 +62,8 @@
 
       To log into the cluster run:
 
-        oc login {{ rosa_cluster_api_url }} --username "{{ install_rhoai_components_admin_user }}" --password '{{ install_rhoai_components_admin_pw }}'
+        oc login {{ install_rhoai_components_cluster_api_url }} --username "{{ install_rhoai_components_admin_user }}" --password '{{ install_rhoai_components_admin_pw }}'
 
       The Red Hat OpenShift AI url is:
 
-        https://{{ rhoai_route }}
+        https://{{ rhoai_route | default('TBD') }}

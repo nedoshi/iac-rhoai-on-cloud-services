@@ -7,6 +7,7 @@
     mode: '0644'
   vars:
     hcp: "{{ rosa_cluster_tf_vars.hcp }}"
+    secondary_machine_pool_enabled: "{{ rosa_cluster_tf_vars.secondary_machine_pool_enabled }}"
     secondary_machine_pool_name: "{{ rosa_cluster_tf_vars.secondary_machine_pool_name }}"
     secondary_machine_pool_instance_type: "{{ rosa_cluster_tf_vars.secondary_machine_pool_instance_type }}"
     secondary_machine_pool_replicas: "{{ rosa_cluster_tf_vars.secondary_machine_pool_replicas }}"
@@ -18,12 +19,20 @@
     mode: '0644'
   vars:
     hcp: "{{ rosa_cluster_tf_vars.hcp }}"
+    secondary_machine_pool_enabled: "{{ rosa_cluster_tf_vars.secondary_machine_pool_enabled }}"
     secondary_machine_pool_name: "{{ rosa_cluster_tf_vars.secondary_machine_pool_name }}"
     secondary_machine_pool_instance_type: "{{ rosa_cluster_tf_vars.secondary_machine_pool_instance_type }}"
     secondary_machine_pool_replicas: "{{ rosa_cluster_tf_vars.secondary_machine_pool_replicas }}"
 
+- name: What cluster am i creating?
+  debug:
+    msg: |
+      ***************************************
+      Preparing to create {{ rosa_cluster_tf_vars.cluster_name }}.
+      This task may take up to an hour.
+      ***************************************
 
-- name: Create the ROSA HCP Cluster (This may take 30 minutes)
+- name: Create the ROSA Cluster (This may take 30 minutes)
   cloud.terraform.terraform:
     project_path: "{{ rosa_cluster_tf_project_path }}"
     state: present
@@ -42,7 +51,7 @@
       developer_password: "{{ rosa_cluster_tf_vars.developer_password }}"
       workers_replicas: "{{ rosa_cluster_tf_vars.workers_replicas }}"
       workers_replicas_max: "{{ rosa_cluster_tf_vars.workers_replicas_max }}"
-      hcp: "{{ rosa_cluster_tf_vars.hcp }}"
+      hcp: "{{ rosa_cluster_tf_vars.hcp | string | lower }}"
     force_init: true
   environment:
     TF_WARN_OUTPUT_ERRORS: '1'
@@ -50,13 +59,23 @@
 
 - name: Set Cluster Login Credentials
   ansible.builtin.set_fact:
-    rosa_cluster_api_url: "{{ _tf.outputs.rosa.value.cluster_api_url }}"
+    cluster_api_url: "{{ _tf.outputs.rosa.value.cluster_api_url }}"
+    ocp_username: "admin"
+    ocp_password: "{{ rosa_cluster_tf_vars.admin_password }}"
+
+- name: make sure OpenShift API url is signed with a valid cert
+  uri:
+    url: "{{ cluster_api_url }}"
+  register: _api_check
+  failed_when: _api_check.status != 403
+  retries: 10
+  delay: 30
 
 - name: Cluster Login
   ansible.builtin.debug:
     msg: |
       to log into the cluster run:
-        oc login {{ rosa_cluster_api_url }} --username admin --password '{{ rosa_cluster_tf_vars.admin_password }}'
+        oc login {{ cluster_api_url }} --username admin --password '{{ ocp_password }}'
 
 - name: Terraform Outputs
   ansible.builtin.debug:

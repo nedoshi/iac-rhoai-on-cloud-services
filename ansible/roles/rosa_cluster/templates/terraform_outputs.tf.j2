@@ -3,6 +3,7 @@ output "bucket_names" {
   value = [for bucket in aws_s3_bucket.multiple_buckets : bucket.bucket]
 }
 
+{% if secondary_machine_pool_enabled %}
 {% if hcp | bool %}
 output "secondary_machine_pool_name" {
   value = rhcs_hcp_machine_pool.secondary_machine_pool.name
@@ -29,11 +30,10 @@ output "secondary_machine_pool_replicas" {
   value = rhcs_machine_pool.secondary_machine_pool.autoscaling_enabled ? "Autoscaling enabled" : "Autoscaling disabled"
 }
 {% endif %}
-
+{% endif %}
 output "rosa" {
   value = module.rosa
 }
 
 
 # added to the jinja template for main.tf, still getting errors with the buckets
-

@@ -1,0 +1,35 @@
+---
+- name: "Init"
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    ansible_python_interpreter: ./virtualenv/bin/python
+  tags:
+    - always
+
+  tasks:
+    - name: "Set a state fact"
+      ansible.builtin.set_fact:
+        state: present
+    - ansible.builtin.set_fact:
+        rosa_cluster_tf_vars:
+          hcp: "{{ (cluster_type == 'rosa_hcp') | ternary(true,false) }}"
+      when:
+
+- name: "Create"
+  hosts: localhost
+  connection: local
+  vars:
+    ansible_python_interpreter: ./virtualenv/bin/python
+  roles:
+    - role: rosa_cluster
+      when: cluster_type in ['rosa_hcp','rosa_classic']
+    - role: aro_cluster
+      when: cluster_type == 'aro'
+
+    - role: install_rhoai_components
+      vars:
+        install_rhoai_components_admin_user: "{{ ocp_username }}"
+        install_rhoai_components_admin_pw: "{{ ocp_password }}"
+        install_rhoai_components_cluster_api_url: "{{ cluster_api_url }}"

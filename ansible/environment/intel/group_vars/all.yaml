@@ -1,0 +1,16 @@
+install_rhoai_components_intel_gpus: true
+install_rhoai_components_nvidia_gpus: true
+
+
+
+  # compute_machine_type: m7i.4xlarge
+  # secondary_machine_pool_enabled: false
+rosa_cluster_tf_vars:
+  compute_machine_type: "m5.xlarge"
+  secondary_machine_pool_enabled: true
+  secondary_machine_pool_name: "gpu-pool"
+  secondary_machine_pool_instance_type: "m7i.4xlarge" #"p4d.24xlarge"
+  secondary_machine_pool_replicas: 3
+  workers_replicas: 2
+  workers_replicas_max: 2
+  hcp: "true"

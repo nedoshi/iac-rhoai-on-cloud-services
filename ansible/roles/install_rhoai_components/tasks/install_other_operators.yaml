@@ -1,172 +1,94 @@
 ---
 
-- name: Create OperatorGroup
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    definition:
-      apiVersion: operators.coreos.com/v1
-      kind: OperatorGroup
-      metadata:
-        name: global-operators
-        namespace: openshift-operators
-      spec: {}
+# - name: Create OperatorGroup
+#   community.okd.k8s:
+#     host: "{{ host }}"
+#     api_key: "{{ api_key }}"
+#     definition:
+#       apiVersion: operators.coreos.com/v1
+#       kind: OperatorGroup
+#       metadata:
+#         name: global-operators
+#         namespace: openshift-operators
+#       spec: {}
 
-- name: Install Service Mesh Operator
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    definition:
-      apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: servicemeshoperator
-        namespace: openshift-operators
-      spec:
-        channel: stable
-        name: servicemeshoperator
-        source: redhat-operators
-        sourceNamespace: openshift-marketplace
+- name: install web terminal operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: web-terminal
+    operator_namespace: openshift-operators
+    operator_channel: fast
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
 
-- name: Install OpenShift Pipelines Operator
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    definition:
-      apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: openshift-pipelines-operator-rh
-        namespace: openshift-operators
-      spec:
-        channel: latest
-        name: openshift-pipelines-operator-rh
-        source: redhat-operators
-        sourceNamespace: openshift-marketplace
+- name: install service mesh operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: servicemeshoperator
+    operator_namespace: openshift-operators
+    operator_channel: stable
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
 
-- name: Install Serverless Operator
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    definition:
-      apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: serverless-operator
-        namespace: openshift-operators
-      spec:
-        channel: stable
-        name: serverless-operator
-        source: redhat-operators
-        sourceNamespace: openshift-marketplace
+- name: install openshift pipelines operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: openshift-pipelines-operator-rh
+    operator_namespace: openshift-operators
+    operator_channel: latest
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
 
-- name: Install Authorino Operator
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    definition:
-      apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: authorino-operator
-        namespace: openshift-operators
-      spec:
-        channel: stable
-        name: authorino-operator
-        source: community-operators
-        sourceNamespace: openshift-marketplace
+- name: install serverless operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: serverless-operator
+    operator_namespace: openshift-operators
+    operator_channel: stable
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
 
-- name: Create namespace for Distributed Tracing
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    name: openshift-distributed-tracing
-    api_version: v1
-    kind: Namespace
-    state: present
+- name: install authorino operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: authorino-operator
+    operator_namespace: openshift-operators
+    operator_channel: stable
+    operator_install_plan_approval: Automatic
+    operator_source: community-operators
+    operator_source_namespace: openshift-marketplace
 
-- name: Create OperatorGroup for Distributed Tracing
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    definition:
-      apiVersion: operators.coreos.com/v1
-      kind: OperatorGroup
-      metadata:
-        name: openshift-distributed-tracing-group
-        namespace: openshift-distributed-tracing
-      spec: {}
+- name: install distributed tracing operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: jaeger-product
+    operator_namespace: openshift-distributed-tracing
+    operator_channel: stable
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
 
-- name: Install OpenShift Distributed Tracing Platform Operator
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    definition:
-      apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: jaeger-product
-        namespace: openshift-distributed-tracing
-      spec:
-        channel: stable
-        name: jaeger-product
-        installPlanApproval: Automatic
-        source: redhat-operators
-        sourceNamespace: openshift-marketplace
-
-## gitops
-- name: Ensure the openshift-gitops-operator namespace exists
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: openshift-gitops-operator
-
-- name: Create OperatorGroup for OpenShift GitOps
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    state: present
-    definition:
-      apiVersion: operators.coreos.com/v1
-      kind: OperatorGroup
-      metadata:
-        name: ropenshift-gitops-operator-group
-        namespace: openshift-gitops-operator
-
-- name: Create Subscription for OpenShift GitOps
-  community.okd.k8s:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    state: present
-    definition:
-      apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: openshift-gitops-operator
-        namespace: openshift-gitops-operator
-      spec:
-        channel: latest
-        installPlanApproval: Automatic
-        name: openshift-gitops-operator
-        source: redhat-operators
-        sourceNamespace: openshift-marketplace
-
-- name: Wait for OpenShift GitOps Operator to be deployed
-  kubernetes.core.k8s_info:
-    host: "{{ host }}"
-    api_key: "{{ api_key }}"
-    kind: Pod
-    wait: true
-    namespace: openshift-gitops-operator
-    label_selectors:
-      - "control-plane=gitops-operator"
-    wait_sleep: 10
-    wait_timeout: 360
+- name: install gitops operator
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: openshift-gitops-operator
+    operator_namespace: openshift-gitops-operator
+    operator_channel: latest
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
+    operator_wait: true
 
 - name: Wait for OpenShift GitOps instance to be deployed
   kubernetes.core.k8s_info:
@@ -179,6 +101,7 @@
       - "app.kubernetes.io/name=openshift-gitops-application-controller"
     wait_sleep: 10
     wait_timeout: 360
+  no_log: true
 
 - name: Give permissions to OpenShift GitOps
   community.okd.k8s:
@@ -200,42 +123,15 @@
             name: openshift-gitops-argocd-application-controller
             namespace: openshift-gitops
 
-- name: Install Elasticsearch for OCP versions below 4.15
-  when: ocp_version is version('4.15', '<')
-  block:
-    - name: Create namespace for Elasticsearch
-      community.okd.k8s:
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        name: openshift-logging
-        api_version: v1
-        kind: Namespace
-        state: present
-
-    - name: Create OperatorGroup for Elasticsearch
-      community.okd.k8s:
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        definition:
-          apiVersion: operators.coreos.com/v1
-          kind: OperatorGroup
-          metadata:
-            name: openshift-logging-group
-            namespace: openshift-logging
-          spec: {}
-
-    - name: Install OpenShift Elasticsearch Operator v4.15
-      community.okd.k8s:
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        definition:
-          apiVersion: operators.coreos.com/v1alpha1
-          kind: Subscription
-          metadata:
-            name: elasticsearch-operator
-            namespace: openshift-logging
-          spec:
-            channel: stable-4.15
-            name: elasticsearch-operator
-            source: redhat-operators
-            sourceNamespace: openshift-marketplace
+- name: install elasticsearch operator if OCP > 4.15
+  when: _ocp_version is version('4.15', '<')
+  include_role:
+    name: install_operator
+  vars:
+    operator_name: elasticsearch-operator
+    operator_namespace: openshift-logging
+    operator_channel: stable
+    operator_install_plan_approval: Automatic
+    operator_source: redhat-operators
+    operator_source_namespace: openshift-marketplace
+    operator_wait: true

@@ -3,6 +3,8 @@
   hosts: localhost
   connection: local
   gather_facts: true
+  vars:
+    ansible_python_interpreter: ./virtualenv/bin/python
   tags:
     - always
 
@@ -14,5 +16,10 @@
 - name: Uninstall ROSA HCP cluster
   hosts: localhost
   connection: local
+  vars:
+    ansible_python_interpreter: ./virtualenv/bin/python
   roles:
     - role: rosa_cluster
+      when: cluster_type in ['rosa_hcp','rosa']
+    - role: aro_cluster
+      when: cluster_type == 'aro'
