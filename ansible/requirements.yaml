@@ -5,7 +5,6 @@ roles:
     scm: git
     version: main
 
-
 collections:
   - name: amazon.aws
   - name: ansible.utils
